@@ -8,6 +8,7 @@ commands = {
     'Exit': 'Exit the program.',
     'Help': 'Print all available commands.',
     'Stats': 'Prints stats from the PokeDex',
+    'Search': "Searches and prints a PokeMon and it's stats"
 }
 
 opts = {
@@ -15,6 +16,13 @@ opts = {
     'filename': 'pokedex',
     'default_filename': 'pokedex',
     'dex_keyword': 'pokedex',
+}
+
+stats_categories = {
+    'Tallest PokeMon': 'height',
+    'Shortest PokeMon': 'weight',
+    'Heaviest PokeMon': 'weight',
+
 }
 
 extra_vars = {
@@ -90,11 +98,11 @@ def detect_dex(dexes):
 
         console.print(multiple_dex_select)
         while True:
-            x = console.input('Type the [cyan]number[/] of which option should be selected: ')
+            inp = console.input('Type the [cyan]number[/] of which option should be selected: ')
             try:
-                x = int(x)
-                if x > 1:
-                    filename = dexes_dict[x]
+                inp = int(inp)
+                if inp > 1:
+                    filename = dexes_dict[inp]
                     break
                 else:
                     console.print(extra_vars['exit_print'])
@@ -103,7 +111,7 @@ def detect_dex(dexes):
             except (ValueError, KeyError):
                 console.print(extra_vars['error_print'])
 
-        filename = dexes_dict[x]
+        filename = dexes_dict[inp]
 
         return filename
 
@@ -142,6 +150,12 @@ while True:  # Main Loop
         break
     elif i == '2':  # Help
         console.print(commands_table_dict)
+    elif i == '3':  # Stats
+        while True:
+            x = console.input()
+    elif i == '4':  # Search
+        while True:
+            x = console.input()
     else:
         console.print('Invalid command', style='bold red')
 
