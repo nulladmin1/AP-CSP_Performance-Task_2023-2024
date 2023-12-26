@@ -19,7 +19,7 @@ opts = {
 
 extra_vars = {
     'exit_print': 'Exiting the program...',
-    'error_print': '[red]Not an optional listed.[/] Please try again.'
+    'error_print': '[red]Not an option listed.[/] Please try again.'
 }
 
 console = Console()
