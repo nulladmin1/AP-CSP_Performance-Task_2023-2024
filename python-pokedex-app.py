@@ -189,8 +189,11 @@ console = Console()
 
 
 def search(pokemon):
-    pokemon_info = dex.loc[dex['Name']]
-    return pokemon_info
+    try:
+        pokemon_data = dex.loc[dex['Name'] == pokemon].values.tolist()
+        return pokemon_data
+    except KeyError:
+        return 'KeyError'
 
 
 def download_dex():
@@ -314,8 +317,12 @@ while True:  # Main Loop
     elif i == '4':  # Search
         while True:
             x = console.input('What PokeMon do you want to search for? ')
-            print(search(x.lower().capitalize()))
-
+            pokemon_info = search(x.lower().capitalize())
+            if pokemon_info != 'KeyError':
+                break
+            else:
+                console.print('PokeMon not found. ')
+        console.print(pokemon_info)
 
     elif i == '5':  # Change Settings
         while True:
