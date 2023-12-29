@@ -4,6 +4,8 @@ import os
 from rich.console import Console
 from rich.table import Table
 from rich import box
+import requests
+
 
 commands = {
     'Exit': 'Exit the program.',
@@ -21,7 +23,6 @@ stats_categories = {
     'Tallest PokeMon': 'height',
     'Shortest PokeMon': 'weight',
     'Heaviest PokeMon': 'weight',
-
 }
 
 extra_vars = {
@@ -31,6 +32,7 @@ extra_vars = {
     'dex_keyword': 'pokedex',
     'exit_print': 'Exiting the program...',
     'error_print': '[red]Not an option listed.[/] Please try again.',
+    'image_url': 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/(pokemon_id).png'
 }
 
 inbuilt_dex = ([1, 'Bulbasaur', ' ', 'Grass', 'Poison', 318, 45, 49, 49, 65, 65, 45, 1],
@@ -188,23 +190,6 @@ inbuilt_dex = ([1, 'Bulbasaur', ' ', 'Grass', 'Poison', 318, 45, 49, 49, 65, 65,
 console = Console()
 
 
-def search(pokemon):
-    try:
-        pokemon_data = dex.loc[dex['Name'] == pokemon].values.tolist()
-        return pokemon_data
-    except KeyError:
-        return 'KeyError'
-
-
-def download_dex():
-    console.print(
-        'Credit to [cyan]lgreski (github.com/lgreski)[/] for the [red]PokeDex .csv dataset[/].\nPulling .csv [red]PokeDex file[/] from[cyan]: ' +
-        extra_vars['dex_url'] + '[/]...')
-
-    urllib.request.urlretrieve(extra_vars['dex_url'], extra_vars['filename'] + '.csv')
-    console.print('[cyan]Done[/] downloading the PokeDex .csv file.  ')
-
-
 def detect_dex(dexes):
     dex_select = Table()
 
@@ -273,6 +258,29 @@ def detect_dex(dexes):
         return filename
 
 
+def download_dex():
+    console.print(
+        'Credit to [cyan]lgreski (github.com/lgreski)[/] for the [red]PokeDex .csv dataset[/].\nPulling .csv [red]PokeDex file[/] from[cyan]: ' +
+        extra_vars['dex_url'] + '[/]...')
+
+    r = requests.get(extra_vars['dex_url'], stream=True)
+    with open(extra_vars['filename'] + '.csv', 'wb') as f:
+        f.write(r.content)
+    console.print('[cyan]Done[/] downloading the PokeDex .csv file.  ')
+
+
+def download_image(pokemon_id):
+    urllib.request.urlretrieve(extra_vars['image_url'].replace('(pokemon_id)', pokemon_id[0]), str(pokemon_id[1]) + '.png')
+
+
+def search(pokemon):
+    try:
+        pokemon_data = dex.loc[dex['Name'] == pokemon].values.tolist()
+        return pokemon_data[0]
+    except KeyError:
+        return 'KeyError'
+
+
 commands_table_dict = Table(title='Available Commands')
 commands_table_dict.add_column('Commands', style='red')
 commands_table_dict.add_column('Description', style='cyan')
@@ -321,8 +329,9 @@ while True:  # Main Loop
             if pokemon_info != 'KeyError':
                 break
             else:
-                console.print('PokeMon not found. ')
+                console.print('[red]PokeMon not found. ')
         console.print(pokemon_info)
+        download_image(pokemon_info)
 
     elif i == '5':  # Change Settings
         while True:
