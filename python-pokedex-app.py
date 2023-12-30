@@ -1,11 +1,10 @@
 import pandas as pd
-import urllib.request
 import os
+import requests
 from rich.console import Console
 from rich.table import Table
 from rich import box
-import requests
-
+from rich_pixels import Pixels
 
 commands = {
     'Exit': 'Exit the program.',
@@ -32,7 +31,8 @@ extra_vars = {
     'dex_keyword': 'pokedex',
     'exit_print': 'Exiting the program...',
     'error_print': '[red]Not an option listed.[/] Please try again.',
-    'image_url': 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/(pokemon_id).png'
+    'image_url': 'https://assets.pokemon.com/assets/cms2/img/pokedex/full/(pokemon_id).png',
+    'image_subfolder': 'images/',
 }
 
 inbuilt_dex = ([1, 'Bulbasaur', ' ', 'Grass', 'Poison', 318, 45, 49, 49, 65, 65, 45, 1],
@@ -254,7 +254,6 @@ def detect_dex(dexes):
                 console.print(extra_vars['error_print'])
 
         filename = dexes_dict[inp]
-
         return filename
 
 
@@ -266,11 +265,24 @@ def download_dex():
     r = requests.get(extra_vars['dex_url'], stream=True)
     with open(extra_vars['filename'] + '.csv', 'wb') as f:
         f.write(r.content)
+
     console.print('[cyan]Done[/] downloading the PokeDex .csv file.  ')
 
 
-def download_image(pokemon_id):
-    urllib.request.urlretrieve(extra_vars['image_url'].replace('(pokemon_id)', pokemon_id[0]), str(pokemon_id[1]) + '.png')
+def download_image(pokemon_data):
+    pokemon_id_url = None
+
+    if len(str(pokemon_data[0])) > 3:
+        pokemon_id_url = pokemon_data[0]
+    else:
+        pokemon_id_url = str(pokemon_data[0]).zfill(4-len(str(pokemon_data[0])))
+
+    url = extra_vars['image_url'].replace('(pokemon_id)', pokemon_id_url)
+
+    r = requests.get(url, stream=True).content
+    print(url)
+    with open(str(pokemon_data[1]).lower() + '.png', 'wb') as f:
+        f.write(r)
 
 
 def search(pokemon):
